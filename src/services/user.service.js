@@ -1,16 +1,39 @@
-export const userFirstService = async (args) =>{
-    console.log("Reached ")
-    console.log("Doing work ")
-    const someDataFromDatabase = "My data"
-    return someDataFromDatabase;
-}
-export const loginUserService = async (loginData) =>{
-    const email= loginData.email;
-    const password = loginData.password
-    console.log("Checking database for login")
-    if(email=="hari@gamil.com"&&password=="test"){
-        return {message: "Login successful"}
+import { prisma } from "../db/indexdb.js";
+
+
+export const loginUserService=async (loginData)=>{
+    // console.log(loginData)
+    const username=loginData.name
+    const email=loginData.email
+    const password=loginData.password
+    const gender=loginData.gender
+    console.log("checking database for login");
+    const user=await prisma.user.findUnique({where:{email}})
+        if(!user){
+            return {message:"no user found"};
+        }
+        const checkpass=user.password==password;
+        const checkuser=user.name==username
+        if(!checkpass || !username){
+            return {message:"wrong password or name"}
+        }
+        else{
+            return {message:"login success"};
+        }
     }
-else 
-return{message:"Login failed!"}
+
+export const allUserService=async()=>{
+    return allUsers=await prisma.user.findMany()
 }
+
+export const registerUserService=async(registerData)=>{
+    const res= await prisma.user.create({data:{
+        fullName:registerData.fullName,
+            email:registerData.email,
+            password:registerData.password,
+            gender:registerData.gender,
+
+    },
+    })
+ return res;
+ }
