@@ -1,39 +1,75 @@
 import { prisma } from "../db/indexdb.js";
+import { hash } from "bcrypt";
+import { generateJwtToken } from "../libs/jwt.utils.js";
+import { checkPassword, generateHashForPassword } from "../libs/password.utility.js";
+
 
 
 export const loginUserService=async (loginData)=>{
-    // console.log(loginData)
-    const username=loginData.name
     const email=loginData.email
     const password=loginData.password
-    const gender=loginData.gender
     console.log("checking database for login");
-    const user=await prisma.user.findUnique({where:{email}})
-        if(!user){
-            return {message:"no user found"};
-        }
-        const checkpass=user.password==password;
-        const checkuser=user.name==username
-        if(!checkpass || !username){
-            return {message:"wrong password or name"}
-        }
-        else{
-            return {message:"login success"};
-        }
+    const user=await prisma.user.findUnique({where:{email: email}})
+    if(!user){
+        throw new Error("Invalid credentials", { cause: "CustomError" });
     }
 
+    const isPasswordSame = await checkPassword(password, user.password);
+    if (!isPasswordSame) {
+        throw new Error("Invalid credentials", { cause: "CustomError" });
+    }
+    const token = generateJwtToken(user.id);
+    console.log(token)
+    delete user.password;
+     return {message:"login success",user, token};
+ };
+
 export const allUserService=async()=>{
-    return allUsers=await prisma.user.findMany()
+    return await prisma.user.findMany()
 }
 
 export const registerUserService=async(registerData)=>{
+    const hashedPassword = await generateHashForPassword(
+        registerData.password
+    )
     const res= await prisma.user.create({data:{
         fullName:registerData.fullName,
             email:registerData.email,
-            password:registerData.password,
+            password:hashedPassword,
             gender:registerData.gender,
 
     },
+    omit: {
+        password: true
+    },
     })
- return res;
+    const token = generateJwtToken(registerData.id);
+    console.log(token)
+    
+return {token,res};
  }
+ export const getUserProfileService = async(userId)=>{
+    const user= await prisma.user.findUnique({
+        where: {
+            id:userId,
+        },
+        omit: {password:true},
+    })
+    return {user}
+ }
+//  export const SignUpservice = async (signUpData) => {
+//     const HashedPassword = await decryptpassword(signUpData.password);
+//     const res = await prisma.user.create({
+//       data: {
+//         fullName: signUpData.fullName,
+//         password: HashedPassword,
+//         email: signUpData.email,
+//         gender: signUpData.gender,
+//       },
+//       omit: {
+//         password: true,
+//       },
+//     });
+//     const token = generateJwtToken(res.id);
+//     return { user: res, token };
+//   };

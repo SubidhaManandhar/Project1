@@ -24,10 +24,29 @@ model User{
   email String @unique
   password String
   gender GenderEnum
-
+  posts Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   @@map("users")
 }
+
+model Post {
+  id      Int      @id @default(autoincrement())
+  content String
+  likescount Int
+  user  User @relation(fields: [userId], references: [id])
+  userId String // relation scalar field  (used in the `@relation` attribute above)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("posts")
+  // profile Profile?
+}
+
+// model Profile {
+//   id     Int  @id @default(autoincrement())
+//   user   Post @relation(fields: [userId], references: [id])
+//   userId Int  @unique // relation scalar field (used in the `@relation` attribute above)
+// }
