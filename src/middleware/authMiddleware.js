@@ -5,9 +5,8 @@ import { StatusCodes } from "http-status-codes";
     const authHeader = req.headers.authorization;
     const authToken = authHeader?.split(" ")[1];
     if(!authToken){
-        res.status((statusCodes.UNAUTHORIZED).json({message:"Invalid token"}))
+        res.status(StatusCodes.UNAUTHORIZED).json({message:"Invalid token"})
     }
-    console.log(authToken)
 
     try {
         const payload = jwt.verify(authToken,process.env.JWT_SECRET);
@@ -17,7 +16,8 @@ import { StatusCodes } from "http-status-codes";
         if(!user){
             res.status((StatusCodes.UNAUTHORIZED).json({message:"Unauthorized"}))
         }
-        res.userId = userId //data transfer from middleware
+        req.userId = userId //data transfer from middleware so that id isn't copied from database
+        console.log(req.userId)
         next();
     } catch (error) {
         next(error)

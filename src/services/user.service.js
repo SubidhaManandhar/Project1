@@ -43,10 +43,10 @@ export const registerUserService=async(registerData)=>{
         password: true
     },
     })
-    const token = generateJwtToken(registerData.id);
+    const token = generateJwtToken(res.id);
     console.log(token)
     
-return {token,res};
+return {token,user:res};
  }
  export const getUserProfileService = async(userId)=>{
     const user= await prisma.user.findUnique({
@@ -57,19 +57,3 @@ return {token,res};
     })
     return {user}
  }
-//  export const SignUpservice = async (signUpData) => {
-//     const HashedPassword = await decryptpassword(signUpData.password);
-//     const res = await prisma.user.create({
-//       data: {
-//         fullName: signUpData.fullName,
-//         password: HashedPassword,
-//         email: signUpData.email,
-//         gender: signUpData.gender,
-//       },
-//       omit: {
-//         password: true,
-//       },
-//     });
-//     const token = generateJwtToken(res.id);
-//     return { user: res, token };
-//   };

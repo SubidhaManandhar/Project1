@@ -1,18 +1,18 @@
 import {Router} from "express"
-import { createPostController, getAllPostsController, getPostByIdController } from "../controllers/post.controller.js";
-// import { StatusCodes} from "http-status-codes"
-// import { loginUsercontroller,allUserController, registerUserController, getUserProfile } from "../controllers/user.controller.js"
-// import { authMiddleware } from "../middleware/authMiddleware.js"
+import { createPostController, DeletePostController, getAllPostsController, getPostByIdController, getPostByuserIdController, UpdatePostController } from "../controllers/post.controller.js";
 
-// api/users
+ import { authMiddleware } from "../middleware/authMiddleware.js"
+
+// api/posts
 const postRouter = Router()
 
 
-postRouter.get("/", getAllPostsController);
-postRouter.post("/", createPostController);
-postRouter.post("/:postId", getPostByIdController);
-// postRouter.post("/:postId", UpdatePostController);
-// postRouter.post("/:postId", DeletePostController);
+postRouter.get("/", authMiddleware, getAllPostsController);
+postRouter.post("/", authMiddleware, createPostController);
+postRouter.get("/:postId", authMiddleware, getPostByIdController);
+postRouter.get("/user/:userId", authMiddleware, getPostByuserIdController);
+postRouter.delete("/:postId", authMiddleware,DeletePostController);
+postRouter.patch("/:postId", authMiddleware,UpdatePostController);
 export default postRouter
 
 
